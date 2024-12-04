@@ -6,6 +6,106 @@
     <title>My Portfolio Resume</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9f9f9;
+        }
+
+        header {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #007bff, #00d2ff);
+            color: white;
+        }
+
+        header h1 {
+            margin: 0.5rem 0;
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+        }
+
+        header p {
+            font-size: 1.2rem;
+        }
+
+        section {
+            padding: 2rem;
+            margin: 1rem 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .invotive-heading {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: #007bff;
+            margin-bottom: 1rem;
+        }
+
+        p, ul {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        ul {
+            list-style-type: disc;
+            padding-left: 2rem;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .social-links a {
+            display: inline-block;
+            margin-right: 1rem;
+            color: #333;
+            font-size: 1.2rem;
+        }
+
+        .social-links a:hover {
+            color: #007bff;
+        }
+
+        img {
+            max-width: 150px;
+            margin-top: 1rem;
+            border-radius: 8px;
+        }
+
+        .hobbies {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .hobby {
+            text-align: center;
+            margin: 1rem;
+        }
+
+        .hobby i {
+            font-size: 2rem;
+            color: #007bff;
+            margin-bottom: 0.5rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: #333;
+            color: white;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -31,8 +131,8 @@
         <h2 class="invotive-heading">Education</h2>
         <p><strong>PARUL University</strong> - Bachelor of Technology in Computer Science</p>
         <p>Expected graduation: 2026</p>
-        <a href="https://www.google.com/search?q=Parul+University&oq=PARUL&gs_lcrp=EgZjaHJvbWUqBggAEEUYOzIGCAAQRRg7MgYIARBFGDwyBggCEEUYOzIGCAMQRRg5MgYIBBBFGDwyBggFEEUYPDIGCAYQRRhBMgYIBxAuGEDSAQgzMDMwajBqMagCCLACAQ&sourceid=chrome&ie=UTF-8" target="_blank">
-            <img src="https://logowik.com/content/uploads/images/parul-university9542.jpg" alt="PARUL University Logo" style="max-width: 100px; height: auto;">
+        <a href="https://www.google.com/search?q=Parul+University" target="_blank">
+            <img src="https://logowik.com/content/uploads/images/parul-university9542.jpg" alt="PARUL University Logo">
         </a>
     </section>
     <section>
@@ -66,7 +166,7 @@
     <section>
         <h2 class="invotive-heading">Hobbies</h2>
         <div class="hobbies">
-            <div class=" hobby">
+            <div class="hobby">
                 <i class="fas fa-volleyball-ball"></i>
                 <p>Playing Volleyball</p>
             </div>
@@ -89,4 +189,3 @@
     </footer>
 </body>
 </html>
-
