@@ -1,0 +1,78 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f8ff;
+}
+
+header {
+    background: #4a90e2;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin: 0 15px;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+}
+
+main {
+    padding: 20px;
+}
+
+/* Character Styles */
+.character {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin: 20px 0;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    opacity: 0; /* Start hidden for fade-in effect */
+    transform: translateY(20px); /* Start slightly lower for effect */
+    animation: fadeIn 0.5s forwards; /* Fade-in animation */
+}
+
+/* Character Image Styles */
+.character-image {
+    width: 100%;
+    max-width: 200px;
+    border-radius: 8px;
+    transition: transform 0.3s ease; /* Smooth scaling */
+}
+
+.character-image:hover {
+    transform: scale(1.1); /* Scale up on hover */
+}
+
+/* Animation Keyframes */
+@keyframes fadeIn {
+    to {
+        opacity: 1; /* Fully visible */
+        transform: translateY(0); /* Move to original position */
+    }
+}
+
+/* Footer Styles */
+footer {
+    text-align: center;
+    padding: 10px;
+    background: #4a90e2;
+    color: white;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
