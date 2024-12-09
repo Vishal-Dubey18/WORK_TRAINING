@@ -1,0 +1,73 @@
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #f0f0f0; /* Light gray background */
+}
+
+header {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+h1 {
+  font-size: 2.5rem;
+  color: #ff6347; /* Tomato color */
+  animation: rainbow 5s linear infinite; /* Animation for colorful effect */
+}
+
+@keyframes rainbow {
+  0% { color: #ff6347; }
+  14% { color: #ffcc00; }
+  28% { color: #33cc33; }
+  42% { color: #00ccff; }
+  57% { color: #9933ff; }
+  71% { color: #ff33cc; }
+  85% { color: #ff6347; }
+  100% { color: #ff6347; }
+}
+
+.gallery {
+  column-count: 4;
+  gap: 1rem;
+  padding: 4rem;
+}
+
+.image {
+  overflow: hidden; /* Ensures the hover effect is contained */
+  transition: transform 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.image:hover {
+  transform: scale(1.05); /* Scale effect on hover */
+}
+
+.image img {
+  height: auto;
+  width: 100%;
+  display: block; /* Ensures no extra space below images */
+}
+
+/* Responsive-ness for different screen-sizes */
+@media screen and (max-width: 810px) {
+  .gallery {
+    column-count: 3;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .gallery {
+    column-count: 2;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .gallery {
+    column-count: 1;
+  }
+}
