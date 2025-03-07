@@ -3,10 +3,12 @@ import numpy as np
 import face_recognition
 import os
 from datetime import datetime
-import requests
+import smtplib
+from email.message import EmailMessage
+import time
 
-path = r'F:\GIT_HUB\HACKATHON\SMART_TRACKING_SYSTEM\IMAGES_KNOWN'
-unknown_faces_path = r'F:\GIT_HUB\HACKATHON\SMART_TRACKING_SYSTEM\IMAGES_UNKNOWN'
+path = r'F:\GIT_HUB\PROJECT\SMART_TRACKING_SYSTEM\IMAGES_KNOWN'
+unknown_faces_path = r'F:\GIT_HUB\PROJECT\SMART_TRACKING_SYSTEM\IMAGES_UNKNOWN'
 images = []
 classNames = []
 myList = os.listdir(path)
@@ -18,32 +20,60 @@ for cl in myList:
     classNames.append(os.path.splitext(cl)[0])
 print(f"Class names: {classNames}")
 
-def send_email_alert_mailbluster(to_email, subject, body):
-    API_KEY = 'e313cf59-d85d-4d29-9b00-cad3af9576c5' 
-    API_URL = 'https://app.mailbluster.com/K37jeedQEg'
-    
-    email_data = {
-        'from': 'priyanshuraikwar2305@gmail.com', 
-        'to': to_email,  
-        'subject': subject, 
-        'body': body,  
-        'is_html': False  
-    }
+EMAIL_CONFIG = {
+    'smtp_server': 'smtp.gmail.com',
+    'smtp_port': 465,
+    'sender_email': 'vdubey8511@gmail.com',  # Replace with your email
+    'sender_password': 'nogcmdrmgvgcrkik',  # Generated App Password
+    'recipient_email': 'vdubey8511@gmail.com'  # Alert destination
+}
 
-    headers = {
-        'Authorization': f'Bearer {API_KEY}',
-        'Content-Type': 'application/json'
-    }
+# Performance optimizations
+PROCESS_EVERY_N_FRAMES = 3  # Process every 3rd frame
+DETECTION_THRESHOLD = 0.42
+TIME_DELAY_BETWEEN_ALERTS = 5  # 5 seconds delay between alerts
+LAST_ALERT_TIME = 0
+
+def send_gmail_alert(subject, body, attachment_path=None):
+    msg = EmailMessage()
+    msg['Subject'] = subject
+    msg['From'] = EMAIL_CONFIG['sender_email']
+    msg['To'] = EMAIL_CONFIG['recipient_email']
+    msg.set_content(body)
+
+    if attachment_path:
+        if not os.path.exists(attachment_path):
+            print(f"Attachment file not found: {attachment_path}")
+            return
+            
+        try:
+            with open(attachment_path, 'rb') as f:
+                file_data = f.read()
+                file_name = os.path.basename(attachment_path)
+                msg.add_attachment(
+                    file_data,
+                    maintype='image',
+                    subtype='jpeg',
+                    filename=file_name
+                )
+                print(f"Attached image: {file_name}")
+        except Exception as e:
+            print(f"Error attaching image: {e}")
+            return
 
     try:
-        response = requests.post(API_URL, json=email_data, headers=headers)
-        if response.status_code == 200:
-            print("Email sent successfully!")
-        else:
-            print(f"Failed to send email. Status code: {response.status_code}")
-            print(response.json())
+        with smtplib.SMTP_SSL(
+            EMAIL_CONFIG['smtp_server'], 
+            EMAIL_CONFIG['smtp_port']
+        ) as server:
+            server.login(
+                EMAIL_CONFIG['sender_email'], 
+                EMAIL_CONFIG['sender_password']
+            )
+            server.send_message(msg)
+        print("Email sent successfully!")
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"Error sending email: {e}")
 
 def findEncodings(images):
     encodeList = []
@@ -75,15 +105,27 @@ def mark(name, markedNames):
 
 def saveUnknownFace(faceImg):
     timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-    filename = f'{unknown_faces_path}\\Unknown_{timestamp}.jpg'
+    filename = os.path.join(unknown_faces_path, f"Unknown_{timestamp}.jpg")
+    
+    # Ensure directory exists
+    if not os.path.exists(unknown_faces_path):
+        os.makedirs(unknown_faces_path)
+    
+    # Check if image is valid
+    if faceImg.size == 0:
+        print("Empty image, not saving")
+        return None
+    
     cv2.imwrite(filename, faceImg)
     print(f"Unknown face saved as {filename}")
+    return filename
 
 encodeListKnown = findEncodings(images)
 print("Encoding Done")
 
 markedNames = set()
 known_unknown_encodings = [] 
+frame_counter = 0
 
 cap = cv2.VideoCapture(0)
 
@@ -92,9 +134,15 @@ while True:
     if not success:
         break
 
+    frame_counter += 1
+    if frame_counter % PROCESS_EVERY_N_FRAMES != 0:
+        continue
+
+    # Convert and resize frame
     imgS = cv2.resize(img, (0, 0), None, 0.25, 0.25)
     imgS = cv2.cvtColor(imgS, cv2.COLOR_BGR2RGB)
 
+    # Detect faces
     facesCurFrame = face_recognition.face_locations(imgS, model='hog')
     encodesCurFrame = face_recognition.face_encodings(imgS, facesCurFrame)
 
@@ -103,32 +151,68 @@ while True:
         faceDis = face_recognition.face_distance(encodeListKnown, encodeFace)
         matchIndex = np.argmin(faceDis)
 
-        if matches[matchIndex] and faceDis[matchIndex] < 0.42:
+        if matches[matchIndex] and faceDis[matchIndex] < DETECTION_THRESHOLD:
             name = classNames[matchIndex].upper()
             mark(name, markedNames)
             color = (0, 255, 0)
         else:
             name = 'Unknown'
             color = (0, 0, 255)
+            
+            # Process only if enough time has passed since last alert
+            current_time = time.time()
+            if current_time - LAST_ALERT_TIME < TIME_DELAY_BETWEEN_ALERTS:
+                continue
+            
+            # Scale back up face locations
             y1, x2, y2, x1 = faceLoc
             y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
-            faceImg = img[y1:y2, x1:x2]  
-            faceImgRGB = cv2.cvtColor(faceImg, cv2.COLOR_BGR2RGB) 
             
+            # Validate coordinates
+            if y1 < 0 or x2 > img.shape[1] or y2 > img.shape[0] or x1 < 0:
+                print("Invalid face coordinates")
+                continue
+            
+            faceImg = img[y1:y2, x1:x2].copy()
+            
+            # Process face image
+            faceImgRGB = cv2.cvtColor(faceImg, cv2.COLOR_BGR2RGB)
             unknown_encoding = face_recognition.face_encodings(faceImgRGB)
-            if unknown_encoding:
-                unknown_encoding = unknown_encoding[0]
-                if not any(face_recognition.compare_faces(known_unknown_encodings, unknown_encoding)):
-                    saveUnknownFace(faceImg)  
-                    known_unknown_encodings.append(unknown_encoding)  
-                    send_email_alert_mailbluster( 
-                        'vdubey8511@gmail.com',
-                        'Alert: Unknown Face Detected',
-                        f'An unknown face was detected at {datetime.now()}. Please check the webcam feed.'
-                    )
-                else:
-                    print("Duplicate unknown face detected, not saving.")
             
+            if not unknown_encoding:
+                print("No face found in cropped image")
+                continue
+            
+            unknown_encoding = unknown_encoding[0]
+            
+            # Check for duplicates with time-based reset
+            duplicate = any(
+                face_recognition.compare_faces(
+                    known_unknown_encodings,
+                    unknown_encoding,
+                    tolerance=0.4
+                )
+            )
+            
+            if not duplicate:
+                filename = saveUnknownFace(faceImg)
+                if filename:
+                    known_unknown_encodings.append(unknown_encoding)
+                    # Keep only recent 5 unknown faces
+                    if len(known_unknown_encodings) > 5:
+                        known_unknown_encodings.pop(0)
+                    
+                    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    send_gmail_alert(
+                        f'🚨 Alert: Unknown Face @ {timestamp}',
+                        f'Detected unknown face at {timestamp}\nFilename: {os.path.basename(filename)}',
+                        filename
+                    )
+                    LAST_ALERT_TIME = current_time
+            else:
+                print("Duplicate unknown face detected, skipping")
+
+        # Draw rectangle with name
         y1, x2, y2, x1 = faceLoc
         y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
         cv2.rectangle(img, (x1, y1), (x2, y2), color, 2)
@@ -140,8 +224,8 @@ while True:
         text_size = cv2.getTextSize(name, font, font_scale, thickness)[0]
         text_width, text_height = text_size
 
-        cv2.rectangle(img, (x1, y2 - 35), (x2, y2), color, cv2.FILLED)
-        cv2.putText(img, name, (x1 + (x2 - x1 - text_width) // 2, y2 - 10), font, font_scale, (255, 255, 255), thickness)
+        cv2.putText(img, name, (x1 + (x2 - x1 - text_width) // 2, y2 - 10), 
+                   font, font_scale, (255, 255, 255), thickness)
 
     cv2.imshow('Webcam', img)
 
