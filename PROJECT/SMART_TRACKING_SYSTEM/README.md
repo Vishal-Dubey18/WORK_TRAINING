@@ -10,7 +10,7 @@ The **Smart Tracking System** is a cutting-edge facial recognition application d
 This project leverages:
 - `face_recognition` for robust facial recognition.
 - OpenCV for real-time image processing.
-- Mailbluster for seamless email notifications.
+- Gmail for seamless email notifications.
 
 ---
 
@@ -38,12 +38,12 @@ Ensure you have the following installed:
 - OpenCV
 - NumPy
 - face_recognition
-- requests
+- smtplib (for email notifications)
 
 Install dependencies:
 
 ```bash
-pip install opencv-python numpy face_recognition requests
+pip install opencv-python numpy face_recognition
 ```
 
 ---
@@ -59,7 +59,7 @@ pip install opencv-python numpy face_recognition requests
 2. **Navigate to the Project Directory**:
 
    ```bash
-   cd HACKATHON/SMART_TRACKING_SYSTEM
+   cd PROJECT/SMART_TRACKING_SYSTEM
    ```
 
 3. **Prepare Known Images**:
@@ -69,7 +69,7 @@ pip install opencv-python numpy face_recognition requests
    - Ensure the `IMAGES_UNKNOWN` directory exists for saving images of unrecognized faces.
 
 5. **Configure Email Alerts**:
-   - Update the `send_email_alert_mailbluster` function in the `Tracking.py` file with your Mailbluster API key and email credentials.
+   - Update the `EMAIL_CONFIG` in the `Tracking.py` file with your Gmail credentials and app password.
 
 6. **Run the Application**:
 
@@ -113,7 +113,8 @@ SMART_TRACKING_SYSTEM/
 
 - ✅ Ensure your webcam is functioning correctly.
 - ✅ Verify image directory paths.
-- ✅ For email issues, double-check your Mailbluster API key and email settings.
+- ✅ For email issues, double-check your Gmail app password and email settings.
+- ✅ Make sure you have created an app password for your Gmail account if 2FA is enabled.
 
 ---
 
@@ -127,7 +128,7 @@ This project is licensed under the **MIT License**. See the `LICENSE` file for m
 
 - **face_recognition**: Powering facial recognition.
 - **OpenCV**: Enabling real-time computer vision.
-- **Mailbluster**: Handling email notifications effortlessly.
+- **Gmail**: Handling email notifications effortlessly.
 
 ---
 
@@ -142,3 +143,6 @@ For inquiries or feedback:
 ## 🔗 GitHub Repository
 
 Find the project repository here: [Smart Tracking System GitHub](https://github.com/Vishal-Dubey18/file.git)
+```
+
+This README file provides comprehensive information about your project, including setup instructions, features, and troubleshooting tips. It should help users understand and run the Smart Tracking System application successfully.
